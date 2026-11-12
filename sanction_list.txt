@@ -1,0 +1,3 @@
+# Domains that must be redirected to the proxy IP
+service.example.org
+both.example.com

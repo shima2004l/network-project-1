@@ -1,0 +1,26 @@
+# ------------------------------
+# DNS Proxy configuration
+# ------------------------------
+
+# Upstream server (the simulator listens on 127.0.0.1:5354)
+upstream_ip=127.0.0.1
+upstream_port=5354
+upstream_timeout_sec=2
+
+# Address that is returned for blocked and sanctioned domains
+sinkhole_ip=0.0.0.0
+proxy_ip=192.0.2.10
+
+# TTL for local (list-based) answers
+local_ttl=60
+
+# Domain list files
+ad_list_file=ad_list.txt
+sanction_list_file=sanction_list.txt
+
+# Local cache
+cache_enabled=true
+
+# Optional bonus settings
+# cache_max_entries=2
+# real_dns_enabled=false

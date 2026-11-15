@@ -82,6 +82,10 @@ public class DnsProxy {
                 System.out.println("Bye.");
                 return;
             }
+            if (command.equals("stats")) {
+                printStats(stats);
+                continue;
+            }
 
             Result result = handleDomain(text, config, lists, cache, stats);
             printResult(result);

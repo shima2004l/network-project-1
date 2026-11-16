@@ -86,6 +86,10 @@ public class DnsProxy {
                 printStats(stats);
                 continue;
             }
+            if (command.equals("reload")) {
+                reloadLists(config, lists);
+                continue;
+            }
 
             Result result = handleDomain(text, config, lists, cache, stats);
             printResult(result);

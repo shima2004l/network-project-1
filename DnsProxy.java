@@ -90,6 +90,10 @@ public class DnsProxy {
                 reloadLists(config, lists);
                 continue;
             }
+            if (command.equals("cache")) {
+                printCache(cache);
+                continue;
+            }
 
             Result result = handleDomain(text, config, lists, cache, stats);
             printResult(result);

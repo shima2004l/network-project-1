@@ -536,6 +536,7 @@ public class DnsProxy {
             String domain = raw.isEmpty() ? "(empty)" : raw;
             Result result = new Result(domain, "NONE", "INVALID_INPUT", null, null);
             stats.update(result);
+            writeLog(result);
             return result;
         }
 
@@ -565,6 +566,7 @@ public class DnsProxy {
         }
 
         stats.update(result);
+        writeLog(result);
         return result;
     }
 

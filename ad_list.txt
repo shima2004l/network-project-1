@@ -1,0 +1,4 @@
+# Advertisement domains
+ads.example.com
+tracker.example.net
+both.example.com

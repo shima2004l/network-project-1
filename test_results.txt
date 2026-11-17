@@ -1,0 +1,301 @@
+========================================================================
+ Smart DNS Proxy - Acceptance Test Results (T1 .. T13)
+========================================================================
+Environment : macOS 27.2
+Java        : 17.0.19
+Test lists  : as given in section 8 of the project document
+Config      : sinkhole_ip=0.0.0.0, proxy_ip=192.0.2.10,
+              local_ttl=60, upstream_timeout_sec=2,
+              cache_enabled=true
+Test setup  : Terminal 1:  ./run.sh upstream
+              Terminal 2:  ./run.sh proxy
+
+[note] The prompt, the typed input and the program output are copied from
+       the real console.  Lines starting with [note] are written by the
+       tester and are not printed by the program.
+========================================================================
+
+
+------------------------------------------------------------------------
+ RUN 1 : mandatory tests T1 .. T12
+------------------------------------------------------------------------
+
+[note] Both programs are started with a fresh log file.
+[note] Upstream console is empty at this point.
+
+DNS Proxy ready.
+Enter domain (or exit): ads.example.com
+Domain : ads.example.com
+Source : AD_BLOCK
+Status : OK
+IP : 0.0.0.0
+TTL : 60
+Enter domain (or exit): sub.ads.example.com
+Domain : sub.ads.example.com
+Source : AD_BLOCK
+Status : OK
+IP : 0.0.0.0
+TTL : 60
+Enter domain (or exit): ADS.Example.COM.
+Domain : ads.example.com
+Source : AD_BLOCK
+Status : OK
+IP : 0.0.0.0
+TTL : 60
+[note] T1, T2 and T3 passed.  Upstream console printed nothing.
+Enter domain (or exit): notads.example.com
+Domain : notads.example.com
+Source : UPSTREAM
+Status : OK
+IP : 198.51.100.7
+TTL : 5
+[note] Upstream console prints:
+       Request #1: notads.example.com -> OK 198.51.100.7 5
+Enter domain (or exit): service.example.org
+Domain : service.example.org
+Source : SANCTION
+Status : OK
+IP : 192.0.2.10
+TTL : 60
+Enter domain (or exit): both.example.com
+Domain : both.example.com
+Source : AD_BLOCK
+Status : OK
+IP : 0.0.0.0
+TTL : 60
+[note] T5 and T6 passed.  Upstream console: nothing new for these two.
+Enter domain (or exit): normal.example.net
+Domain : normal.example.net
+Source : UPSTREAM
+Status : OK
+IP : 198.51.100.7
+TTL : 5
+[note] Upstream console prints:
+       Request #2: normal.example.net -> OK 198.51.100.7 5
+[note] wait 2 seconds
+Enter domain (or exit): normal.example.net
+Domain : normal.example.net
+Source : CACHE
+Status : OK
+IP : 198.51.100.7
+TTL : 3
+[note] T7 and T8 passed.  Cache hit, upstream was not contacted.
+[note] wait until at least 6 seconds have passed since the first request
+Enter domain (or exit): normal.example.net
+Domain : normal.example.net
+Source : UPSTREAM
+Status : OK
+IP : 198.51.100.7
+TTL : 5
+[note] T9 passed: the old cache entry expired and was requested again.
+[note] Upstream console prints:
+       Request #3: normal.example.net -> OK 198.51.100.7 5
+Enter domain (or exit): missing.example.net
+Domain : missing.example.net
+Source : UPSTREAM
+Status : NOT_FOUND
+IP : -
+TTL : -
+Enter domain (or exit): missing.example.net
+Domain : missing.example.net
+Source : UPSTREAM
+Status : NOT_FOUND
+IP : -
+TTL : -
+[note] T10 passed: NOT_FOUND is not cached.
+[note] Upstream console prints:
+       Request #4: missing.example.net -> NOT_FOUND
+       Request #5: missing.example.net -> NOT_FOUND
+[note] now close the Upstream program (Ctrl+C in its console)
+Enter domain (or exit): other.example.net
+Domain : other.example.net
+Source : UPSTREAM
+Status : SERVER_ERROR
+IP : -
+TTL : -
+Enter domain (or exit): ads.example.com
+Domain : ads.example.com
+Source : AD_BLOCK
+Status : OK
+IP : 0.0.0.0
+TTL : 60
+[note] T11 passed: the program reported SERVER_ERROR and stayed alive.
+Enter domain (or exit): 
+Domain : (empty)
+Source : NONE
+Status : INVALID_INPUT
+IP : -
+TTL : -
+Enter domain (or exit): bad domain.com
+Domain : bad domain.com
+Source : NONE
+Status : INVALID_INPUT
+IP : -
+TTL : -
+[note] T12 passed: both invalid inputs produced exactly five lines and the
+       program continued.
+Enter domain (or exit): exit
+Bye.
+
+
+------------------------------------------------------------------------
+ RUN 2 : mandatory test T13  (changed configuration)
+------------------------------------------------------------------------
+
+[note] config.txt is changed to:
+       sinkhole_ip=10.0.0.1
+       cache_enabled=false
+[note] Both programs are started again.  Upstream still uses TTL = 5.
+
+DNS Proxy ready.
+Enter domain (or exit): ads.example.com
+Domain : ads.example.com
+Source : AD_BLOCK
+Status : OK
+IP : 10.0.0.1
+TTL : 60
+Enter domain (or exit): normal.example.net
+Domain : normal.example.net
+Source : UPSTREAM
+Status : OK
+IP : 198.51.100.7
+TTL : 5
+Enter domain (or exit): normal.example.net
+Domain : normal.example.net
+Source : UPSTREAM
+Status : OK
+IP : 198.51.100.7
+TTL : 5
+[note] T13 passed: the new sinkhole IP is used and the second query is not
+       served from cache.
+[note] Upstream console prints:
+       Request #1: normal.example.net -> OK 198.51.100.7 5
+       Request #2: normal.example.net -> OK 198.51.100.7 5
+Enter domain (or exit): exit
+Bye.
+
+
+========================================================================
+ BONUS TESTS (B1 .. B6)
+========================================================================
+
+------------------------------------------------------------------------
+ B1 (stats), B2 (reload), B3 (cache), B4 (log.txt)
+------------------------------------------------------------------------
+
+[note] normal.example.net is requested, then we wait 1 second.
+
+DNS Proxy ready.
+Enter domain (or exit): ads.example.com
+Domain : ads.example.com
+Source : AD_BLOCK
+Status : OK
+IP : 0.0.0.0
+TTL : 60
+Enter domain (or exit): normal.example.net
+Domain : normal.example.net
+Source : UPSTREAM
+Status : OK
+IP : 198.51.100.7
+TTL : 5
+Enter domain (or exit): cache
+normal.example.net | 198.51.100.7 | 4
+Enter domain (or exit): stats
+Total: 2 | AD_BLOCK: 1 | SANCTION: 0 | CACHE: 0 | UPSTREAM: 1 | ERRORS: 0
+[note] the line "newad.example.com" is appended to ad_list.txt now
+Enter domain (or exit): reload
+Lists reloaded.
+Enter domain (or exit): newad.example.com
+Domain : newad.example.com
+Source : AD_BLOCK
+Status : OK
+IP : 0.0.0.0
+TTL : 60
+Enter domain (or exit): exit
+Bye.
+
+[note] Content of log.txt after this run:
+
+2026-11-08 13:00:15 | ads.example.com | AD_BLOCK | OK | 0.0.0.0 | 60
+2026-11-08 13:00:15 | normal.example.net | UPSTREAM | OK | 198.51.100.7 | 5
+2026-11-08 13:00:16 | newad.example.com | AD_BLOCK | OK | 0.0.0.0 | 60
+
+
+------------------------------------------------------------------------
+ B5 (cache_max_entries = 2, upstream TTL = 30)
+------------------------------------------------------------------------
+
+[note] Configuration has cache_max_entries=2.  The simulator is started as
+       "./run.sh upstream 30" so that it returns TTL 30.
+
+DNS Proxy ready.
+Enter domain (or exit): site1.example.net
+Domain : site1.example.net
+Source : UPSTREAM
+Status : OK
+IP : 198.51.100.7
+TTL : 30
+Enter domain (or exit): site2.example.net
+Domain : site2.example.net
+Source : UPSTREAM
+Status : OK
+IP : 198.51.100.7
+TTL : 30
+Enter domain (or exit): site3.example.net
+Domain : site3.example.net
+Source : UPSTREAM
+Status : OK
+IP : 198.51.100.7
+TTL : 30
+Enter domain (or exit): cache
+site2.example.net | 198.51.100.7 | 29
+site3.example.net | 198.51.100.7 | 30
+[note] B5 passed: site1 was the oldest entry and was evicted (FIFO).
+       Remaining TTL values depend on the elapsed time.
+Enter domain (or exit): site1.example.net
+Domain : site1.example.net
+Source : UPSTREAM
+Status : OK
+IP : 198.51.100.7
+TTL : 30
+Enter domain (or exit): exit
+Bye.
+
+
+------------------------------------------------------------------------
+ B6 (real DNS, implemented with a raw DNS query)
+------------------------------------------------------------------------
+
+[note] config.txt:
+       upstream_ip=8.8.8.8
+       upstream_port=53
+       real_dns_enabled=true
+[note] The addresses and TTL values below are real values returned by
+       8.8.8.8 and can change from one run to another.
+
+DNS Proxy ready.
+Enter domain (or exit): example.com
+Domain : example.com
+Source : UPSTREAM
+Status : OK
+IP : 104.20.23.154
+TTL : 300
+[note] wait 3 seconds
+Enter domain (or exit): example.com
+Domain : example.com
+Source : CACHE
+Status : OK
+IP : 104.20.23.154
+TTL : 297
+Enter domain (or exit): nonexistent-domain-99999.invalid
+Domain : nonexistent-domain-99999.invalid
+Source : UPSTREAM
+Status : NOT_FOUND
+IP : -
+TTL : -
+Enter domain (or exit): exit
+Bye.
+
+========================================================================
+ END OF TEST RESULTS
+========================================================================

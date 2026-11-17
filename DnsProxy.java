@@ -479,6 +479,14 @@ public class DnsProxy {
     }
 
     static UpstreamResult queryUpstream(String domain, Config config) {
+        if (config.realDnsEnabled) {
+            RealDns.Result result = RealDns.query(
+                    domain, config.upstreamIp, config.upstreamPort, config.timeoutMs);
+            if (result.status.equals("OK")) {
+                return new UpstreamResult("OK", result.ip, result.ttl);
+            }
+            return new UpstreamResult(result.status, null, 0);
+        }
         return queryTextUpstream(domain, config);
     }
 

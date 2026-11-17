@@ -194,6 +194,11 @@ public class DnsProxy {
         config.realDnsEnabled = parseBool(
                 values.getOrDefault("real_dns_enabled", "false"), "real_dns_enabled");
 
+        if (values.containsKey("cache_max_entries")) {
+            config.cacheMaxEntries = parseInt(
+                    values.get("cache_max_entries"), "cache_max_entries", 1, null);
+        }
+
         return config;
     }
 
@@ -419,6 +424,12 @@ public class DnsProxy {
             }
             if (entries.containsKey(name)) {
                 entries.remove(name);
+            } else if (maxEntries != null && entries.size() >= maxEntries) {
+                Iterator<String> iterator = entries.keySet().iterator();
+                if (iterator.hasNext()) {
+                    iterator.next();
+                    iterator.remove();
+                }
             }
             entries.put(name, new CacheEntry(ip, ttl));
         }

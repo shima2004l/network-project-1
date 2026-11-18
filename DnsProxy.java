@@ -237,7 +237,7 @@ public class DnsProxy {
         if (!Double.isFinite(seconds) || seconds <= 0) {
             failConfig("invalid upstream_timeout_sec: " + value);
         }
-        return (int) Math.round(seconds * 1000);
+        return Math.max(1, (int) Math.round(seconds * 1000));
     }
 
     static boolean parseBool(String value, String key) {
@@ -365,6 +365,9 @@ public class DnsProxy {
                 if (!Character.isDigit(part.charAt(i))) {
                     return false;
                 }
+            }
+            if (part.length() > 1 && part.charAt(0) == '0') {
+                return false;
             }
             int number = Integer.parseInt(part);
             if (number > 255) {

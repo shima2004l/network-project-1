@@ -76,7 +76,7 @@ public class DnsProxy {
             }
 
             String text = line.trim();
-            String command = text.toLowerCase();
+            String command = text.toLowerCase(Locale.ROOT);
 
             if (command.equals("exit")) {
                 System.out.println("Bye.");
@@ -159,6 +159,9 @@ public class DnsProxy {
         Map<String, String> values = new LinkedHashMap<>();
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
+            if (i == 0 && line.startsWith("\uFEFF")) {
+                line = line.substring(1);
+            }
             line = line.trim();
             if (line.isEmpty() || line.startsWith("#")) {
                 continue;
@@ -238,7 +241,7 @@ public class DnsProxy {
     }
 
     static boolean parseBool(String value, String key) {
-        String lowered = value.toLowerCase();
+        String lowered = value.toLowerCase(Locale.ROOT);
         if (!lowered.equals("true") && !lowered.equals("false")) {
             failConfig("invalid " + key + ": " + value);
         }
@@ -257,6 +260,9 @@ public class DnsProxy {
         List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
+            if (i == 0 && line.startsWith("\uFEFF")) {
+                line = line.substring(1);
+            }
             String item = line.trim();
             if (item.isEmpty() || item.startsWith("#")) {
                 continue;
@@ -330,7 +336,7 @@ public class DnsProxy {
     }
 
     static String normalizeDomain(String name) {
-        String result = name.trim().toLowerCase();
+        String result = name.trim().toLowerCase(Locale.ROOT);
         if (result.endsWith(".")) {
             result = result.substring(0, result.length() - 1);
         }

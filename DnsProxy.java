@@ -401,6 +401,7 @@ public class DnsProxy {
         }
     }
 
+    // Cache keeps the original TTL and insertion order for FIFO eviction.
     static class Cache {
         boolean enabled;
         Integer maxEntries;

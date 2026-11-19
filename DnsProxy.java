@@ -520,6 +520,9 @@ public class DnsProxy {
     }
 
     static UpstreamResult parseUpstreamReply(String reply) {
+        if (reply.isEmpty()) {
+            return UpstreamResult.serverError();
+        }
         if (reply.equals("NOT_FOUND")) {
             return UpstreamResult.notFound();
         }

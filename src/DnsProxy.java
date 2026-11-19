@@ -440,6 +440,12 @@ public class DnsProxy {
             }
             if (entries.containsKey(name)) {
                 entries.remove(name);
+            } else if (maxEntries != null && entries.size() >= maxEntries) {
+                Iterator<String> iterator = entries.keySet().iterator();
+                if (iterator.hasNext()) {
+                    iterator.next();
+                    iterator.remove();
+                }
             }
             entries.put(name, new CacheEntry(ip, ttl));
         }

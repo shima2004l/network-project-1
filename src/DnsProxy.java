@@ -381,6 +381,10 @@ public class DnsProxy {
                 }
             }
 
+            if (part.length() > 1 && part.charAt(0) == '0') {
+                return false;
+            }
+
             int number = Integer.parseInt(part);
 
             if (number > 255) {

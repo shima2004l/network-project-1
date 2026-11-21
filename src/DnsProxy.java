@@ -76,7 +76,7 @@ public class DnsProxy {
             }
 
             String text = line.trim();
-            String command = text.toLowerCase();
+            String command = text.toLowerCase(Locale.ROOT);
 
             if (command.equals("exit")) {
                 System.out.println("Bye.");
@@ -246,7 +246,7 @@ public class DnsProxy {
     }
 
     static boolean parseBool(String value, String key) {
-        String lowered = value.toLowerCase();
+        String lowered = value.toLowerCase(Locale.ROOT);
         if (!lowered.equals("true") && !lowered.equals("false")) {
             failConfig("invalid " + key + ": " + value);
         }
@@ -341,7 +341,7 @@ public class DnsProxy {
     }
 
     static String normalizeDomain(String name) {
-        String result = name.trim().toLowerCase();
+        String result = name.trim().toLowerCase(Locale.ROOT);
         if (result.endsWith(".")) {
             result = result.substring(0, result.length() - 1);
         }

@@ -237,7 +237,8 @@ public class DnsProxy {
         }
 
         if (!Double.isFinite(seconds)
-                || seconds <= 0) {
+                || seconds <= 0
+                || seconds > Integer.MAX_VALUE / 1000.0) {
 
             failConfig("invalid upstream_timeout_sec: " + value);
         }

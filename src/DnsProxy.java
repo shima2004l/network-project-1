@@ -481,7 +481,9 @@ public class DnsProxy {
             long elapsedSeconds =
                     (System.nanoTime() - entry.storedNanos) / 1_000_000_000L;
 
-            return entry.ttl - (int) elapsedSeconds;
+            long remaining = (long) entry.ttl - elapsedSeconds;
+
+            return (int) Math.max(0, remaining);
         }
     }
 
